@@ -1,9 +1,15 @@
 import express from "express";
 import cors from "cors";
-import session from "express-session"
+import session from "express-session";
+import { settings } from "./config";
+import authRouter from "./api/auth";
+import disputesRouter from "./api/disputes";
+// import dashboardRouter from "./api/dashboard";
+// import sheetsRouter from "./api/sheets";
+// import internalRouter from "./api/internal";
+
 const app = express();
 app.use(express.json());
-import { settings } from "./config";
 
 app.use(
   session({
@@ -20,8 +26,9 @@ app.use(
     credentials: true,
   })
 );
-// app.use("/auth", authRouter);
-// app.use("/api/disputes", disputesRouter);
+
+app.use("/auth", authRouter);
+app.use("/api/disputes", disputesRouter);
 // app.use("/api/dashboard", dashboardRouter);
 // app.use("/api/sheets", sheetsRouter);
 // app.use("/internal", internalRouter);
@@ -29,7 +36,7 @@ app.use(
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
-// add in env later
+
 const PORT = Number(process.env.PORT) || 8000;
 app.listen(PORT, () => {
   console.log(`listening on ${PORT}`);

@@ -82,3 +82,11 @@ Full audit trail — subcollection under each dispute.
 
 \- No migrations needed. If the schema changes later, update this file and notify the team in Slack/standup.
 
+## Composite Indexes (created in GCP Console)
+- disputes: user_id (asc) + status (asc)
+- disputes: status (asc) + next_followup_at (asc)
+
+
+## Artifact Registry
+- Repo: dispute-repo (Docker format, us-central1)
+- Docker auth configured for: us-central1-docker.pkg.dev

@@ -1,36 +1,187 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DisputeFlow Frontend
+
+Production-quality Next.js frontend for the DisputeFlow billing dispute automation platform.
+
+## Tech Stack
+
+- **Next.js 16** with App Router
+- **TypeScript** (strict mode)
+- **Tailwind CSS** v4
+- **shadcn/ui** components (New York style)
+- **Lucide React** icons
+- **Sonner** for toast notifications
+
+## Features
+
+- 🔐 Google OAuth authentication
+- 📊 Dashboard with stats and dispute tracking
+- 📧 AI-powered email generation with approval workflow
+- ⚙️ Settings management (Google Sheets, approval mode, notifications)
+- 📱 Fully responsive (mobile, tablet, desktop)
+- 🎨 Clean, modern SaaS design
+- ♿ Accessible UI components
 
 ## Getting Started
 
-First, run the development server:
+### Development
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env.local` file:
 
-## Learn More
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Production Build
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# Build for production
+npm run build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Start production server
+npm start
+```
 
-## Deploy on Vercel
+## Docker
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Build and run with Docker:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# Build image
+docker build -t disputeflow-frontend .
+
+# Run container
+docker run -p 3000:3000 \
+  -e NEXT_PUBLIC_API_URL=http://localhost:8000 \
+  disputeflow-frontend
+```
+
+The Dockerfile uses multi-stage builds with Next.js standalone output for optimal image size.
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── (protected)/        # Protected routes (require auth)
+│   │   ├── dashboard/
+│   │   ├── disputes/
+│   │   │   └── [id]/
+│   │   └── settings/
+│   ├── layout.tsx          # Root layout with providers
+│   └── page.tsx            # Landing/login page
+│
+├── components/
+│   ├── ui/                 # shadcn/ui components
+│   ├── Sidebar.tsx
+│   ├── StatsCards.tsx
+│   ├── DisputeTable.tsx
+│   ├── DisputeForm.tsx
+│   ├── EmailPreview.tsx
+│   ├── EmailThread.tsx
+│   ├── PendingApproval.tsx
+│   ├── StatusBadge.tsx
+│   └── Toaster.tsx
+│
+└── lib/
+    ├── api.ts              # API client
+    ├── types.ts            # TypeScript types
+    ├── auth-context.tsx    # Authentication provider
+    └── utils.ts            # Utilities
+```
+
+## API Integration
+
+The frontend integrates with the backend API via the following endpoints:
+
+**Authentication:**
+- `GET /auth/me` - Get current user
+- `POST /auth/logout` - Logout
+- `GET /auth/login` - Google OAuth login redirect
+
+**Dashboard:**
+- `GET /api/dashboard/stats` - Dashboard statistics
+
+**Disputes:**
+- `GET /api/disputes` - List disputes
+- `GET /api/disputes/:id` - Get dispute detail
+- `POST /api/disputes` - Create dispute
+- `PATCH /api/disputes/:id` - Update dispute
+- `POST /api/disputes/:id/generate-email` - Generate email
+- `POST /api/disputes/:id/send-email` - Send email
+- `GET /api/disputes/:id/emails` - Get email history
+- `GET /api/disputes/:id/pending-draft` - Get pending draft
+- `POST /api/disputes/:id/approve-send` - Approve and send
+- `POST /api/disputes/:id/skip` - Skip approval
+
+**Settings:**
+- `PATCH /api/users/me/settings` - Update user settings
+- `GET /api/sheets/validate` - Validate Google Sheet
+
+## Email Approval Workflow
+
+The app supports two approval modes:
+
+### Auto-send Mode
+Generated emails are sent immediately without review.
+
+### Manual Mode
+1. Email is generated and enters `pending_approval` state
+2. User reviews the draft on the dispute detail page
+3. User can:
+   - **Send** - Approve as-is
+   - **Edit** - Modify subject/body then send
+   - **Skip** - Dismiss this draft
+
+## Dispute Status Flow
+
+```
+new
+ ↓
+generate email
+ ↓
+AUTO → sent
+ OR
+MANUAL → pending_approval → (Send/Edit/Skip) → sent
+ ↓
+follow_up_1 → follow_up_2 → escalated → resolved
+```
+
+## Security
+
+- Cookies-based authentication (credentials: "include")
+- No secrets in `NEXT_PUBLIC_*` variables
+- Protected routes require authentication
+- Input validation on all forms
+- Sanitized HTML rendering for email previews
+
+## Accessibility
+
+- Semantic HTML
+- Keyboard navigation
+- ARIA labels and roles
+- Accessible form controls
+- Sufficient color contrast
+- Focus states
+
+## Browser Support
+
+- Chrome/Edge (latest)
+- Firefox (latest)
+- Safari (latest)
+- Mobile browsers (iOS Safari, Chrome Android)
+
+## License
+
+Proprietary - All rights reserved

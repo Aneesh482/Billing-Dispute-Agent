@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # DisputeFlow Frontend
 
 Production-quality Next.js frontend for the DisputeFlow billing dispute automation platform.
@@ -185,3 +186,6 @@ follow_up_1 → follow_up_2 → escalated → resolved
 ## License
 
 Proprietary - All rights reserved
+=======
+# Billing-Dispute-Agent
+>>>>>>> 04ae3762edff8ba65629e3589992b499c9f125de
